@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Altas Bajas y Modificaciones</title>
+    <style>
+        html{
+            font-size: 25px;
+        }
+        @media (max-width:768px){
+            html{
+            font-size: 18px;
+            }
+            table{
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+        @media (max-width:450px){
+            html{
+            font-size: 12px;
+            }
+            table{
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+       .contenido{
+        position: relative;
+        display: flex;
+        justify-content: center;
+       }
+       table{
+        display: block;
+        border-collapse: collapse;
+        white-space: nowrap;
+       }
+       table, th, td{
+        border: 1px solid black;
+       }
+       .svg{
+        width: 20px;
+        height: 20px;
+        fill: yellowgreen;
+        cursor: pointer;
+       }
+    </style>
+</head>
+<body>
+    <p style="text-align: center;"><strong>Agregar Nuevo Registro : </strong><svg onclick="Agregar()" class="svg"><path d="M14.613,10c0,0.23-0.188,0.419-0.419,0.419H10.42v3.774c0,0.23-0.189,0.42-0.42,0.42s-0.419-0.189-0.419-0.42v-3.774H5.806c-0.23,0-0.419-0.189-0.419-0.419s0.189-0.419,0.419-0.419h3.775V5.806c0-0.23,0.189-0.419,0.419-0.419s0.42,0.189,0.42,0.419v3.775h3.774C14.425,9.581,14.613,9.77,14.613,10 M17.969,10c0,4.401-3.567,7.969-7.969,7.969c-4.402,0-7.969-3.567-7.969-7.969c0-4.402,3.567-7.969,7.969-7.969C14.401,2.031,17.969,5.598,17.969,10 M17.13,10c0-3.932-3.198-7.13-7.13-7.13S2.87,6.068,2.87,10c0,3.933,3.198,7.13,7.13,7.13S17.13,13.933,17.13,10"></path></svg></p>
+    <div class="contenido">
+        <table id="tabla">
+           
+        </table>
+    </div>
+<script>
+traer();
+function traer(){
+    fetch('./traer.php',{
+
+    }).then((response)=>{
+        return response.text();
+    }).then((res)=>{
+        document.getElementById("tabla").innerHTML=res;
+    })
+}
+function fechaamd(date){
+    let concatenofech=[];
+    let concat="";
+    for(let dt of date){
+        if(dt !=='/'){
+            concat+=""+dt;
+        }else{
+            concatenofech.push(concat);
+            concat="";
+        }
+    }
+    concatenofech.push(concat);
+    return concatenofech[2]+"-"+concatenofech[1]+"-"+concatenofech[0];
+}
+function Agregar(){
+    let nombre,apellido,dni,fechanac,correo;
+    nombre = prompt("Ingrese el Nombre");
+    if(nombre === null){
+        return;
+    }
+    apellido = prompt("Ingrese el Apellido");
+    if(apellido === null){
+        return;
+    }
+    dni = prompt("Ingrese el DNI (solo numeros sin puntos ni comas)");
+    if(dni === null){
+        return;
+    }
+    fechanac = prompt("Ingrese Fecha de Nacimiento dia/mes/Año Ej:-> 05/04/1987");
+    if(fechanac === null){
+        return;
+    }
+    fechanac=fechaamd(fechanac);
+    correo = prompt("Ingrese el Correo");
+    if(correo === null){
+        return;
+    }
+    const paramss = new URLSearchParams();
+    paramss.set("nombre",nombre);
+    paramss.set("apellido",apellido);
+    paramss.set("dni",dni);
+    paramss.set("fechanac",fechanac);
+    paramss.set("correo",correo);
+    fetch('./agregar.php', {
+    method: 'POST',
+    body: paramss,
+    }).then((response) => {
+        return response.text();
+     }).then((res)=>{
+        if(res === "ok"){
+            traer();
+        }else if(res==="no permitido"){
+            console.log(res);
+            alert("Caracter no Permitido, por favor llene bien los campos");
+        }else{
+            alert("Algo salio mal");
+        }
+     });
+
+}
+function Escucha(){
+    window.addEventListener("keydown",recarga);
+}
+function recarga(evento){
+    
+    if (evento.key === "Escape"){
+        window.removeEventListener("keydown",recarga);
+        traer();
+    }
+}
+function Addme(id){
+    Escucha();
+document.getElementById("n1"+id).hidden=true;
+document.getElementById("n2"+id).hidden=false;
+document.getElementById("n2"+id).focus();
+document.getElementById("a1"+id).hidden=true;
+document.getElementById("a2"+id).hidden=false;
+document.getElementById("d1"+id).hidden=true;
+document.getElementById("d2"+id).hidden=false;
+document.getElementById("f1"+id).hidden=true;
+document.getElementById("f2"+id).hidden=false;
+document.getElementById("c1"+id).hidden=true;
+document.getElementById("c2"+id).hidden=false;
+
+document.getElementById("svg1"+id).hidden=true;
+document.getElementById("svg2"+id).hidden=false;
+}
+function Aplicar(id){
+    let nombre,apellido,dni,fechanac,correo;
+    nombre=document.getElementById("n22"+id).value;
+    apellido=document.getElementById("a22"+id).value;
+    dni=document.getElementById("d22"+id).value;
+    fechanac=document.getElementById("f22"+id).value;
+    correo=document.getElementById("c22"+id).value;
+    const paramss = new URLSearchParams();
+    paramss.set("id",id);
+    paramss.set("nombre",nombre);
+    paramss.set("apellido",apellido);
+    paramss.set("dni",dni);
+    paramss.set("fechanac",fechanac);
+    paramss.set("correo",correo);
+    fetch('./modificar.php', {
+    method: 'POST',
+    body: paramss,
+    }).then((response) => {
+        return response.text();
+     }).then((res)=>{
+        if(res === "ok"){
+            alert("Se Modifico Correctamente");
+            traer();
+        }else if(res==="no permitido"){
+            console.log(res);
+            alert("Caracter no Permitido, por favor llene bien los campos");
+        }else{
+            alert("Algo salio mal");
+        }
+     });
+}
+function Borrar(id){
+    const paramss = new URLSearchParams();
+    paramss.set("id",id);
+    fetch('./borrar.php', {
+    method: 'POST',
+    body: paramss,
+    }).then((response) => {
+        return response.text();
+     }).then((res)=>{
+        if(res === "ok"){
+            alert("Se Borro Correctamente");
+            traer();
+        }else{
+            console.log(res);
+            alert("Algo salio mal");
+        }
+     });
+
+
+}
+</script>
+</body>
+</html>
